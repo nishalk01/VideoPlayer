@@ -15,7 +15,6 @@ export function isVideo(filename) {
       case 'avi':
       case 'mpg':
       case 'mp4':
-      case 'pdf':
         return true;
     }
     return false;

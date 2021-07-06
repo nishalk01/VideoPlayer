@@ -9,12 +9,15 @@
 import React from 'react';
 import {
   SafeAreaView,
- 
-
 } from 'react-native';
 import { DefaultTheme,Provider as PaperProvider } from 'react-native-paper';
 
+import { NavigationContainer} from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+
+// screens 
 import FolderScreen from './src/Screens/FolderScreen'
+import VideoList from './src/Screens/VideoList';
 
 const theme = {
   ...DefaultTheme,
@@ -26,13 +29,22 @@ const theme = {
   },
 };
 
+
+const Stack=createStackNavigator();
+
 const App=() => {
  
 
   return (
     <PaperProvider theme={theme}>
+      <NavigationContainer>
+      <Stack.Navigator>
+         <Stack.Screen name="FolderScreen" options={{ headerShown:false }}  component={FolderScreen}/>
+         <Stack.Screen name="VideoList" options={{ headerShown:true }}  component={VideoList}/>
+      </Stack.Navigator>
+      </NavigationContainer>
        
-  <FolderScreen/>
+ 
   </PaperProvider>
   );
 };
