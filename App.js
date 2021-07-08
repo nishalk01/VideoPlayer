@@ -7,13 +7,13 @@
  */
 
 import React from 'react';
-import {SafeAreaView} from 'react-native';
+import {StatusBar} from 'react-native';
 import {DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
 import { MenuProvider } from 'react-native-popup-menu';
 
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-
+import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 // screens
 import FolderScreen from './src/Screens/FolderScreen';
 import VideoList from './src/Screens/VideoList';
@@ -34,8 +34,10 @@ const Stack = createStackNavigator();
 const App = () => {
   return (
     <MenuProvider>
-
-   
+  <StatusBar  
+     backgroundColor="#1aa3ff"
+    hidden={false}
+   />  
     <PaperProvider theme={theme}>
       <NavigationContainer>
         <Stack.Navigator>
@@ -46,20 +48,15 @@ const App = () => {
           />
           <Stack.Screen
             name="VideoList"
-            options={{headerShown: false}}
+            options={{headerShown: false,animationEnabled: false}}
             component={VideoList}
-            options={{
-              animationEnabled: false,
-            }}
           />
 
         <Stack.Screen
             name="Player"
-            options={{headerShown: false}}
-            component={PlayerPage}
-            options={{
-              animationEnabled: false,
-            }}
+            options={{headerShown: false,animationEnabled: false}}
+            component={gestureHandlerRootHOC(PlayerPage)}
+          
           />
         </Stack.Navigator>
       </NavigationContainer>

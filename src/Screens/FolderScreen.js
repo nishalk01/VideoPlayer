@@ -56,7 +56,6 @@ export default function FolderScreen({navigation}) {
           <View style={{paddingHorizontal: 10, width: 100, height: 100}}>
             <Icon name="folder-video" size={90} color="#1aa3ff" />
             <Paragraph numberOfLines={2} style={{fontWeight: 'bold'}}>
-              {' '}
               {eachUFolder}
             </Paragraph>
           </View>

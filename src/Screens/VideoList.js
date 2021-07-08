@@ -10,7 +10,10 @@ import {readDir} from 'react-native-fs';
 
 import {isVideo} from '../Helper';
 import {Paragraph, Badge} from 'react-native-paper';
-// import MediaMeta from 'react-native-media-meta';
+import {
+  OrientationLocker,
+  PORTRAIT,
+} from 'react-native-orientation-locker';
 
 let VidListArray;
 
@@ -29,7 +32,8 @@ function VideoList({route, navigation}) {
         res.map((eachFile, index) => {
           if (isVideo(eachFile.name) && eachFile.isFile()) {
             eachFile['id'] = String(index);
-            VidListArray.push(eachFile);
+            VidListArray.push(eachFile)
+           
           }
         });
         setFile(VidListArray);
@@ -61,7 +65,7 @@ function VideoList({route, navigation}) {
             resizeMode="cover"
             style={{height: 110, borderRadius: 10}}
           />
-          <Badge
+          {/* <Badge
             visible={true}
             style={{
               color: 'white',
@@ -71,8 +75,8 @@ function VideoList({route, navigation}) {
               position: 'absolute',
             }}>
             12:30
-          </Badge>
-          <Paragraph numberOfLines={2}> {item.name}</Paragraph>
+          </Badge> */}
+          <Paragraph numberOfLines={3}> {item.name}</Paragraph>
         </View>
       </TouchableNativeFeedback>
     );
@@ -84,6 +88,9 @@ function VideoList({route, navigation}) {
 
   return (
     <View style={{flex: 1}}>
+       <OrientationLocker
+        orientation={PORTRAIT}
+      />
       {/* <Button
         mode="contained"
         onPress={() => {
@@ -104,6 +111,7 @@ function VideoList({route, navigation}) {
         numColumns={2}
         ListEmptyComponent={EmptyVideo}
         removeClippedSubviews={true}
+        maxToRenderPerBatch={6}
         getItemLayout={(data, index) => ({
           length: 160,
           offset: 160 * index,
