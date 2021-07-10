@@ -51,7 +51,7 @@ function VideoList({route, navigation}) {
             ? TouchableNativeFeedback.SelectableBackground()
             : ''
         }
-        onPress={() => navigation.navigate('Player', {uri: item.path})}>
+        onPress={() => navigation.navigate('Player', {uri: item.path,filename:item.name})}>
         <View
           style={{
             width: 170,
