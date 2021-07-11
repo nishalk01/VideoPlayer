@@ -9,11 +9,11 @@
 import React from 'react';
 import {StatusBar} from 'react-native';
 import {DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
-import { MenuProvider } from 'react-native-popup-menu';
+import {MenuProvider} from 'react-native-popup-menu';
 
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
+import {gestureHandlerRootHOC} from 'react-native-gesture-handler';
 // screens
 import FolderScreen from './src/Screens/FolderScreen';
 import VideoList from './src/Screens/VideoList';
@@ -23,9 +23,9 @@ const theme = {
   ...DefaultTheme,
   roundness: 2,
   colors: {
-    ...DefaultTheme.primary,
+    ...DefaultTheme.colors,
     primary: '#1aa3ff',
-    // accent: '#ff9900',
+    accent: '#ff9900',
   },
 };
 
@@ -34,33 +34,29 @@ const Stack = createStackNavigator();
 const App = () => {
   return (
     <MenuProvider>
-  <StatusBar  
-     backgroundColor="#1aa3ff"
-    hidden={false}
-   />  
-    <PaperProvider theme={theme}>
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="FolderScreen"
-            options={{headerShown: false}}
-            component={FolderScreen}
-          />
-          <Stack.Screen
-            name="VideoList"
-            options={{headerShown: false,animationEnabled: false}}
-            component={VideoList}
-          />
+      <StatusBar backgroundColor="#1aa3ff" hidden={false} />
+      <PaperProvider theme={theme}>
+        <NavigationContainer>
+          <Stack.Navigator>
+            <Stack.Screen
+              name="FolderScreen"
+              options={{headerShown: false}}
+              component={FolderScreen}
+            />
+            <Stack.Screen
+              name="VideoList"
+              options={{headerShown: false, animationEnabled: false}}
+              component={VideoList}
+            />
 
-        <Stack.Screen
-            name="Player"
-            options={{headerShown: false,animationEnabled: false}}
-            component={gestureHandlerRootHOC(PlayerPage)}
-          
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </PaperProvider>
+            <Stack.Screen
+              name="Player"
+              options={{headerShown: false, animationEnabled: false}}
+              component={gestureHandlerRootHOC(PlayerPage)}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </PaperProvider>
     </MenuProvider>
   );
 };

@@ -5,15 +5,14 @@ import {
   TouchableNativeFeedback,
   Platform,
   FlatList,
+  StyleSheet,
 } from 'react-native';
 import {readDir} from 'react-native-fs';
 
 import {isVideo} from '../Helper';
 import {Paragraph, Badge} from 'react-native-paper';
-import {
-  OrientationLocker,
-  PORTRAIT,
-} from 'react-native-orientation-locker';
+import {OrientationLocker, PORTRAIT} from 'react-native-orientation-locker';
+import ListAppbar from '../Components/ListAppbar';
 
 let VidListArray;
 
@@ -23,17 +22,16 @@ function VideoList({route, navigation}) {
   // console.log(route.params.path)
   const [FileList, setFile] = useState([]);
   const [duration, setDuration] = useState(0);
-
+  const [ShowAppBar, setShowAppBar] = useState(null);
   useEffect(() => {
-    VidListArray=[]
+    VidListArray = [];
     console.log('hello');
     readDir(route.params.path)
       .then(res => {
         res.map((eachFile, index) => {
           if (isVideo(eachFile.name) && eachFile.isFile()) {
             eachFile['id'] = String(index);
-            VidListArray.push(eachFile)
-           
+            VidListArray.push(eachFile);
           }
         });
         setFile(VidListArray);
@@ -51,19 +49,21 @@ function VideoList({route, navigation}) {
             ? TouchableNativeFeedback.SelectableBackground()
             : ''
         }
-        onPress={() => navigation.navigate('Player', {uri: item.path,filename:item.name})}>
+        onPress={() =>
+          navigation.navigate('Player', {uri: item.path, filename: item.name})
+        }
+        onLongPress={() => {
+          setShowAppBar(item.id);
+        }}>
         <View
-          style={{
-            width: 170,
-            height: 160,
-            margin: 10,
-            justifyContent: 'center',
-            borderRadius: 30,
-          }}>
+          style={[
+            styles.card,
+            ShowAppBar === item.id ? styles.selectedCard : null,
+          ]}>
           <Image
             source={{uri: `file://${item.path}`}}
             resizeMode="cover"
-            style={{height: 110, borderRadius: 10}}
+            style={styles.image}
           />
           {/* <Badge
             visible={true}
@@ -88,9 +88,9 @@ function VideoList({route, navigation}) {
 
   return (
     <View style={{flex: 1}}>
-       <OrientationLocker
-        orientation={PORTRAIT}
-      />
+      <OrientationLocker orientation={PORTRAIT} />
+      <ListAppbar />
+
       {/* <Button
         mode="contained"
         onPress={() => {
@@ -111,7 +111,7 @@ function VideoList({route, navigation}) {
         numColumns={2}
         ListEmptyComponent={EmptyVideo}
         removeClippedSubviews={true}
-        maxToRenderPerBatch={6}
+        maxToRenderPerBatch={15}
         getItemLayout={(data, index) => ({
           length: 160,
           offset: 160 * index,
@@ -123,3 +123,19 @@ function VideoList({route, navigation}) {
 }
 
 export default memo(VideoList);
+
+const styles = StyleSheet.create({
+  card: {
+    width: 170,
+    height: 160,
+    margin: 10,
+    justifyContent: 'center',
+  },
+  image: {
+    height: 110,
+    borderRadius: 10,
+  },
+  selectedCard: {
+    backgroundColor: 'rgba(0, 0, 1, .4)',
+  },
+});

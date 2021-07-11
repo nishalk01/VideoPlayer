@@ -1,4 +1,4 @@
-import React, {useEffect, useState,useMemo} from 'react';
+import React, {useEffect, useState, useMemo} from 'react';
 import {Paragraph, TouchableRipple} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/Entypo';
 import {View} from 'react-native';
@@ -36,9 +36,6 @@ export default function FolderScreen({navigation}) {
     //   console.log(filepath)
     // })
   }, []);
-
-
-
 
   const DisplayFolders = VideoUniqueFolder.length ? (
     VideoUniqueFolder.map(eachUFolder => {

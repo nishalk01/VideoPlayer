@@ -1,5 +1,5 @@
 import {readDir} from 'react-native-fs';
-
+import {ToastAndroid} from 'react-native';
 //src:  https://stackoverflow.com/questions/9229645/remove-duplicate-values-from-js-array
 export const getExtension = filename => {
   var parts = filename.split('.');
@@ -32,3 +32,13 @@ export function walkDir(dir, callback) {
     });
   });
 }
+
+export const showToastWithGravityAndOffset = message => {
+  ToastAndroid.showWithGravityAndOffset(
+    String(message),
+    ToastAndroid.LONG,
+    ToastAndroid.BOTTOM,
+    25,
+    50,
+  );
+};
