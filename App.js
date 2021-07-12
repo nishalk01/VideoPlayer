@@ -9,7 +9,6 @@
 import React from 'react';
 import {StatusBar} from 'react-native';
 import {DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
-import {MenuProvider} from 'react-native-popup-menu';
 
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -18,6 +17,8 @@ import {gestureHandlerRootHOC} from 'react-native-gesture-handler';
 import FolderScreen from './src/Screens/FolderScreen';
 import VideoList from './src/Screens/VideoList';
 import PlayerPage from './src/Screens/PlayerPage';
+
+import { navigationRef } from './src/RootNavigation';
 
 const theme = {
   ...DefaultTheme,
@@ -33,10 +34,9 @@ const Stack = createStackNavigator();
 
 const App = () => {
   return (
-    <MenuProvider>
-      <StatusBar backgroundColor="#1aa3ff" hidden={false} />
       <PaperProvider theme={theme}>
-        <NavigationContainer>
+          <StatusBar backgroundColor="#1aa3ff" hidden={false} />
+        <NavigationContainer ref={navigationRef}>
           <Stack.Navigator>
             <Stack.Screen
               name="FolderScreen"
@@ -45,7 +45,7 @@ const App = () => {
             />
             <Stack.Screen
               name="VideoList"
-              options={{headerShown: false, animationEnabled: false}}
+              options={{headerShown: false, animationEnabled: true}}
               component={VideoList}
             />
 
@@ -57,7 +57,6 @@ const App = () => {
           </Stack.Navigator>
         </NavigationContainer>
       </PaperProvider>
-    </MenuProvider>
   );
 };
 

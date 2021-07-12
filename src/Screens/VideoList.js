@@ -23,6 +23,8 @@ function VideoList({route, navigation}) {
   const [FileList, setFile] = useState([]);
   const [duration, setDuration] = useState(0);
   const [ShowAppBar, setShowAppBar] = useState(null);
+  const [ShowFilteredData,setShowFilteredData]=useState(false);
+  const [FilteredData,setFilteredData]=useState([]);
   useEffect(() => {
     VidListArray = [];
     console.log('hello');
@@ -85,11 +87,21 @@ function VideoList({route, navigation}) {
   const EmptyVideo = () => {
     return <Paragraph>No video Found in this folder</Paragraph>;
   };
+  
+
+  const FilterChange=(data)=>{
+    setFilteredData(data);
+    setShowFilteredData(true)
+
+  }
+  const onSearchBarClosed=(ShowSearch)=>{
+    setShowFilteredData(!ShowSearch);
+  }
 
   return (
     <View style={{flex: 1}}>
       <OrientationLocker orientation={PORTRAIT} />
-      <ListAppbar />
+      <ListAppbar FileList={FileList} onFilterChange={FilterChange} onSearchBarClosed={onSearchBarClosed}  />
 
       {/* <Button
         mode="contained"
@@ -105,7 +117,7 @@ function VideoList({route, navigation}) {
 
       <FlatList
         // src: https://stackoverflow.com/questions/51742856/sorting-react-native-flatlist/51743104 in next line
-        data={FileList.sort((a, b) => a.name.localeCompare(b.name))}
+        data={!ShowFilteredData?FileList.sort((a, b) => a.name.localeCompare(b.name)):FilteredData}
         renderItem={renderVideoItem}
         keyExtractor={item => item.id}
         numColumns={2}

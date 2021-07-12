@@ -1,43 +1,27 @@
 import React, {useState} from 'react';
 import {StyleSheet} from 'react-native';
-import {Appbar, Divider, Paragraph} from 'react-native-paper';
-import {
-  Menu,
-  MenuOption,
-  MenuOptions,
-  MenuTrigger,
-} from 'react-native-popup-menu';
+import {Appbar, Divider,Menu} from 'react-native-paper';
+
 
 export default function Navbar() {
+  const [visible, setVisible] = useState(false);
+
+  const openMenu = () => setVisible(true);
+
+  const closeMenu = () => setVisible(false);
+
   return (
     <Appbar.Header dark={true}>
-      {/* <Appbar.BackAction onPress={()=>{console.log("helo")}} /> */}
       <Appbar.Content title="VideoPlayer 📽" />
-
-      <Menu onBackdropPress={() => console.log('hello')}>
-        <MenuTrigger>
-          <Appbar.Action icon="dots-vertical" />
-        </MenuTrigger>
-        <MenuOptions>
-          <MenuOption onSelect={() => alert(`Save`)} style={styles.menuoption}>
-            <Paragraph style={styles.menutxt}>Select Folder</Paragraph>
-          </MenuOption>
+      <Menu
+          visible={visible}
+          onDismiss={closeMenu}
+          anchor={<Appbar.Action icon="dots-vertical" onPress={openMenu} />}>
+          <Menu.Item onPress={() => {}} title="Item 1" />
+          <Menu.Item onPress={() => {}} title="Item 2" />
           <Divider />
-          <MenuOption onSelect={() => {}} style={styles.menuoption}>
-            <Paragraph style={styles.menutxt}>Select File to serve</Paragraph>
-          </MenuOption>
-          <Divider />
-          <MenuOption
-            onSelect={() => alert(`Not called`)}
-            disabled={true}
-            text="Disabled"
-          />
-
-          <MenuOption onSelect={() => {}} style={styles.menuoption}>
-            <Paragraph style={styles.menutxt}>yo</Paragraph>
-          </MenuOption>
-        </MenuOptions>
-      </Menu>
+          <Menu.Item onPress={() => {}} title="Item 3" />
+        </Menu>
     </Appbar.Header>
   );
 }
