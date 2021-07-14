@@ -1,9 +1,11 @@
 import React, {useState} from 'react';
 import {StyleSheet} from 'react-native';
-import {Appbar, Divider,Menu} from 'react-native-paper';
+import {Appbar,Menu} from 'react-native-paper';
+import { navigate } from '../RootNavigation';
 
 
-export default function Navbar() {
+
+export default function Navbar({ openFolderPicker }) {
   const [visible, setVisible] = useState(false);
 
   const openMenu = () => setVisible(true);
@@ -17,10 +19,8 @@ export default function Navbar() {
           visible={visible}
           onDismiss={closeMenu}
           anchor={<Appbar.Action icon="dots-vertical" onPress={openMenu} />}>
-          <Menu.Item onPress={() => {}} title="Item 1" />
-          <Menu.Item onPress={() => {}} title="Item 2" />
-          <Divider />
-          <Menu.Item onPress={() => {}} title="Item 3" />
+          <Menu.Item onPress={openFolderPicker} title="Choose Folder" />
+          <Menu.Item onPress={()=>navigate("ServePage")} title="Start Server" />
         </Menu>
     </Appbar.Header>
   );

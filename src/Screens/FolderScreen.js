@@ -1,14 +1,27 @@
-import React, {useEffect, useState, useMemo} from 'react';
+import React, {useEffect, useState,memo} from 'react';
+import {View,FlatList,alert} from 'react-native';
 import {Paragraph, TouchableRipple} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/Entypo';
-import {View} from 'react-native';
-import Navbar from '../Components/Navbar';
 import {ExternalStorageDirectoryPath, readdir, readDir} from 'react-native-fs';
-
+import DocumentPicker from 'react-native-document-picker';
+import RNFetchBlob from 'rn-fetch-blob'
+import Navbar from '../Components/Navbar';
 import {isVideo} from '../Helper';
+
 let VideoFolders = [];
-export default function FolderScreen({navigation}) {
+
+function add(arr, name) {
+  const { length } = arr;
+  const found = arr.some(el => el.foldername === name);
+  if (!found){
+    arr.push({ selected:"false",foldername:name })
+  }
+  return arr;
+}
+
+function FolderScreen({navigation}) {
   const [VideoUniqueFolder, setVideoUniqueFolder] = useState([]);
+  const [ChoosenFile,setChoosenFile]=useState([]);
 
   // TODO ask for storage permission
   useEffect(() => {
@@ -19,14 +32,15 @@ export default function FolderScreen({navigation}) {
           .then(res => {
             res.map(eachFile => {
               if (eachFile.isFile() && isVideo(eachFile.name)) {
-                VideoFolders.push(eachFolder);
+             
+                setVideoUniqueFolder(add(VideoFolders,eachFolder))
               }
             });
             //src : https://stackoverflow.com/questions/1960473/get-all-unique-values-in-a-javascript-array-remove-duplicates
-            setVideoUniqueFolder([...new Set(VideoFolders)]);
+           console.log(VideoUniqueFolder)
           })
           .catch(err => {
-            // console.log(err)
+            console.log(err)
           });
       });
     });
@@ -35,42 +49,96 @@ export default function FolderScreen({navigation}) {
     // walkDir(ExternalStorageDirectoryPath,(filepath)=>{
     //   console.log(filepath)
     // })
+
+
   }, []);
 
-  const DisplayFolders = VideoUniqueFolder.length ? (
-    VideoUniqueFolder.map(eachUFolder => {
-      return (
-        <TouchableRipple
-          key={eachUFolder}
-          style={{margin: 10}}
-          onPress={() => {
-            console.log(`${ExternalStorageDirectoryPath}/${eachUFolder}`);
-            navigation.navigate('VideoList', {
-              path: `${ExternalStorageDirectoryPath}/${eachUFolder}`,
-            });
-          }}
-          rippleColor="rgba(0, 0, 0, .2)">
-          <View style={{paddingHorizontal: 10, width: 100, height: 100}}>
-            <Icon name="folder-video" size={90} color="#1aa3ff" />
-            <Paragraph numberOfLines={2} style={{fontWeight: 'bold'}}>
-              {eachUFolder}
-            </Paragraph>
-          </View>
-        </TouchableRipple>
-      );
+const SelectFolder = async () =>{
+  try{
+    const res=await DocumentPicker.pick({
+      type:[DocumentPicker.types.video],
     })
-  ) : (
-    <Paragraph>No Videos found in first level from root</Paragraph>
-  );
+
+    const filepath= await  RNFetchBlob.fs.stat(res.uri);
+    
+    // src: https://stackoverflow.com/questions/29496515/get-directory-from-a-file-path-or-url
+    // TODO add exception here
+    try{
+      console.log(filepath.path)
+      const selectedPath=filepath.path.split("/").slice(0,-1).join("/")
+      setVideoUniqueFolder([...VideoUniqueFolder,{ selected:"true",foldername:selectedPath }])
+    }
+    catch(err){
+      console.log(err)
+    }
+    
+
+    
+   
+  }
+  catch(err){
+    if(DocumentPicker.isCancel(err)){
+      alert("cancelled from doc picker")
+    }
+    else{
+      console.log(JSON.stringify(err))
+      throw err
+    }
+  }
+} 
+
+
+
+ const renderItem=({item})=>{
+   return(
+    <TouchableRipple
+    style={{margin: 10}}
+    onPress={() => {
+      if(item.selected==="false"){
+        navigation.navigate('VideoList', {
+          path: `${ExternalStorageDirectoryPath}/${item.foldername}`,
+        });
+
+      }
+      else {
+        navigation.navigate('VideoList', {
+          path: item.foldername
+
+      })
+
+    }
+    }}
+    rippleColor="rgba(0, 0, 0, .2)">
+    <View style={{paddingHorizontal: 10}}>
+      <Icon name="folder-video" size={90} color="#1aa3ff" />
+      <Paragraph numberOfLines={2} style={{fontWeight: 'bold',textAlign:"center"}}>
+        {item.selected? item.foldername.substring(item.foldername.lastIndexOf('/')+1):item.foldername}
+      </Paragraph>
+    </View>
+  </TouchableRipple>
+   )
+ }
+
+ const NoVid=()=>{
+   return <Paragraph>No Videos found in first level from root</Paragraph>
+   
+ }
 
   return (
     <>
-      <Navbar />
+      <Navbar openFolderPicker={SelectFolder} />
       {/* folder display layout */}
-      <View
-        style={{flex: 1, margin: 20, flexDirection: 'row', flexWrap: 'wrap'}}>
-        {DisplayFolders}
-      </View>
+      <FlatList
+      data={VideoUniqueFolder}
+      renderItem={renderItem}
+      keyExtractor={(item)=>item.foldername}
+      numColumns={3}
+      ListEmptyComponent={NoVid}
+      />
+      
     </>
   );
 }
+
+
+export default memo(FolderScreen)

@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import { View } from 'react-native';
 import {
   Appbar,
   RadioButton,
@@ -11,12 +12,12 @@ import {
 import filter from 'lodash.filter'
 import {goBack} from '../RootNavigation';
 
-export default function ListAppbar({FileList,onFilterChange,onSearchBarClosed}) {
+
+export default function ListAppbar({FileList,onFilterChange,onSearchBarClosed,OnSort}) {
   const [ShowSearch, setShowSearch] = useState(false);
   const [visible, setVisible] = useState(false);
-  const [checked, setChecked] = useState('first');
   const [Query,setQuery]=useState("");
-
+  const [sort,setSort]=useState(null);
   const showDialog = () => setVisible(true);
 
   const hideDialog = () => setVisible(false);
@@ -41,31 +42,60 @@ export default function ListAppbar({FileList,onFilterChange,onSearchBarClosed}) 
 
   }
 
+  const onSelectSort=()=>{
+   
+    // also change order if sort is not null
+    if(sort!=null){
+      let afterSortList;
+    
+      if(sort==="time"){
+       afterSortList=FileList.sort((a,b)=> {
+         const val=Date.parse(b.mtime)-Date.parse(a.mtime)
+         return val
+        })
+       OnSort(afterSortList)
+      }
+      else if(sort==="alphabet"){
+        afterSortList= FileList.sort((a, b) => a.name.localeCompare(b.name))
+        OnSort(afterSortList)
+      }
+     
+      hideDialog()
+
+  }
+}
   return (
     <>
       <Portal>
         <Dialog visible={visible} onDismiss={hideDialog}>
-          <Dialog.Title>Alert</Dialog.Title>
+          <Dialog.Title>Select Sort by</Dialog.Title>
           <Dialog.Content>
+            <View style={{ flexDirection:"row"}}>
+           
             <RadioButton
-              value="first"
-              status={checked === 'first' ? 'checked' : 'unchecked'}
-              onPress={() => setChecked('first')}
+              value="time"
+              status={sort === 'time' ? 'checked' : 'unchecked'}
+              onPress={() => setSort('time')}
             />
+             <Paragraph>
+              TIME
+            </Paragraph>
 
+            </View>
+            <View style={{ flexDirection:"row"}}>
+           
             <RadioButton
-              value="first"
-              status={checked === 'first' ? 'checked' : 'unchecked'}
-              onPress={() => setChecked('first')}
+              value="alphabet"
+              status={sort === 'alphabet' ? 'checked' : 'unchecked'}
+              onPress={() => setSort('alphabet')}
             />
-            <RadioButton
-              value="first"
-              status={checked === 'first' ? 'checked' : 'unchecked'}
-              onPress={() => setChecked('first')}
-            />
+             <Paragraph>
+              APLHABET
+            </Paragraph>
+          </View>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={hideDialog}>Done</Button>
+            <Button onPress={onSelectSort}>OK</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
@@ -94,6 +124,8 @@ export default function ListAppbar({FileList,onFilterChange,onSearchBarClosed}) 
           value={Query}
         />
       ) : null}
+    
+     
     </>
   );
 }
