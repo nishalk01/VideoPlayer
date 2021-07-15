@@ -6,7 +6,7 @@ import {ExternalStorageDirectoryPath, readdir, readDir} from 'react-native-fs';
 import DocumentPicker from 'react-native-document-picker';
 import RNFetchBlob from 'rn-fetch-blob'
 import Navbar from '../Components/Navbar';
-import {isVideo} from '../Helper';
+import {isVideo,showToastWithGravityAndOffset} from '../Helper';
 
 let VideoFolders = [];
 
@@ -19,9 +19,18 @@ function add(arr, name) {
   return arr;
 }
 
+
+function ifUnique(arr, name) {
+  const { length } = arr;
+  const found = arr.some(el => el.foldername === name);
+  if (!found){
+   return true
+  }
+  return false
+}
+
 function FolderScreen({navigation}) {
   const [VideoUniqueFolder, setVideoUniqueFolder] = useState([]);
-  const [ChoosenFile,setChoosenFile]=useState([]);
 
   // TODO ask for storage permission
   useEffect(() => {
@@ -37,10 +46,9 @@ function FolderScreen({navigation}) {
               }
             });
             //src : https://stackoverflow.com/questions/1960473/get-all-unique-values-in-a-javascript-array-remove-duplicates
-           console.log(VideoUniqueFolder)
           })
           .catch(err => {
-            console.log(err)
+            // console.log(err)
           });
       });
     });
@@ -66,7 +74,15 @@ const SelectFolder = async () =>{
     try{
       console.log(filepath.path)
       const selectedPath=filepath.path.split("/").slice(0,-1).join("/")
+     if(ifUnique(VideoUniqueFolder,selectedPath)){
+       
       setVideoUniqueFolder([...VideoUniqueFolder,{ selected:"true",foldername:selectedPath }])
+     }
+     else{
+      showToastWithGravityAndOffset("Folder with this video is already open")
+      //  show a toast with message folder already open
+     }
+      
     }
     catch(err){
       console.log(err)

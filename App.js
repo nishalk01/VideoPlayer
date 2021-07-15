@@ -17,7 +17,6 @@ import {gestureHandlerRootHOC} from 'react-native-gesture-handler';
 import FolderScreen from './src/Screens/FolderScreen';
 import VideoList from './src/Screens/VideoList';
 import PlayerPage from './src/Screens/PlayerPage';
-import Serve from './src/Screens/Serve';
 
 import { navigationRef } from './src/RootNavigation';
 
@@ -46,20 +45,16 @@ const App = () => {
             />
             <Stack.Screen
               name="VideoList"
-              options={{headerShown: false, animationEnabled: false}}
+              options={{headerShown: false}}
               component={VideoList}
             />
 
             <Stack.Screen
               name="Player"
-              options={{headerShown: false, animationEnabled: false}}
+              options={{headerShown: false}}
               component={gestureHandlerRootHOC(PlayerPage)}
             />
-            <Stack.Screen
-              name="ServePage"
-              options={{headerShown: false, animationEnabled: false}}
-              component={Serve}
-            />
+          
           </Stack.Navigator>
         </NavigationContainer>
       </PaperProvider>

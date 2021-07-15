@@ -9,8 +9,8 @@ import {
 } from 'react-native';
 import {readDir} from 'react-native-fs';
 
-import {isVideo} from '../Helper';
-import {Paragraph,ProgressBar,Colors} from 'react-native-paper';
+import {isVideo, showToastWithGravityAndOffset,formatBytes} from '../Helper';
+import {Paragraph,  Portal,Dialog,Button, Subheading} from 'react-native-paper';
 import {OrientationLocker, PORTRAIT} from 'react-native-orientation-locker';
 import ListAppbar from '../Components/ListAppbar';
 
@@ -20,14 +20,16 @@ let VidListArray;
 
 function VideoList({route, navigation}) {
   const [FileList, setFile] = useState([]);
-  const [ShowAppBar, setShowAppBar] = useState(null);
-  const [ShowFilteredData,setShowFilteredData]=useState(false);
-  const [FilteredData,setFilteredData]=useState([]);
-
+  const [ShowFilteredData, setShowFilteredData] = useState(false);
+  const [FilteredData, setFilteredData] = useState([]);
+  const [SelectedCopy, setSelectedCopy] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [FileInfo, setFileInfo] = useState(null);
+  const showModal = () => setVisible(true);
+  const hideDialog = () => setVisible(false);
 
   useEffect(() => {
     VidListArray = [];
-    console.log(route.params.path)
     readDir(route.params.path)
       .then(res => {
         res.map((eachFile, index) => {
@@ -43,6 +45,26 @@ function VideoList({route, navigation}) {
       });
   }, []);
 
+  const multiListSelect = id => {
+    if (!ShowFilteredData) {
+      let renderData = [...FileList];
+      for (let data of renderData) {
+        if (data.id == id) {
+          data.selected = data.selected == null ? true : !data.selected;
+          if(data.selected){
+            console.log(data)
+          }
+          break;
+        }
+      }
+      setFile(renderData);
+    } else {
+      showToastWithGravityAndOffset(
+        'Cannot select files when search is in progress',
+      );
+    }
+  };
+
   const renderVideoItem = ({item}) => {
     return (
       <TouchableNativeFeedback
@@ -51,16 +73,26 @@ function VideoList({route, navigation}) {
             ? TouchableNativeFeedback.SelectableBackground()
             : ''
         }
-        onPress={() =>
-          navigation.navigate('Player', {uri: item.path, filename: item.name})
-        }
+        onPress={() => {
+          if (!SelectedCopy) {
+            //selected for deletion
+            navigation.navigate('Player', {
+              uri: item.path,
+              filename: item.name,
+            });
+          } else {
+            multiListSelect(item.id);
+          }
+        }}
         onLongPress={() => {
-          setShowAppBar(item.id);
+          console.log(item)
+          setFileInfo(item)
+          showModal()
         }}>
         <View
           style={[
             styles.card,
-            ShowAppBar === item.id ? styles.selectedCard : null,
+            item.selected && SelectedCopy ? styles.selectedCard : null,
           ]}>
           <Image
             source={{uri: `file://${item.path}`}}
@@ -76,27 +108,77 @@ function VideoList({route, navigation}) {
   const EmptyVideo = () => {
     return <Paragraph>No video Found in this folder</Paragraph>;
   };
-  
 
-  const FilterChange=(data)=>{
+  const FilterChange = data => {
     setFilteredData(data);
-    setShowFilteredData(true)
-
-  }
-  const OnSort=(data)=>{
-    setFile(data)
-  }
-  const onSearchBarClosed=(ShowSearch)=>{
+    setShowFilteredData(true);
+  };
+  const OnSort = data => {
+    setFile(data);
+  };
+  const onSearchBarClosed = ShowSearch => {
     setShowFilteredData(!ShowSearch);
-  }
+  };
 
+  const OnselectCopy = () => {
+    setSelectedCopy(!SelectedCopy);
+  };
+
+  const OnDeleteFiles = () => {
+    // start deleting files here
+    
+    let renderData = [...FileList];
+      for (let data of renderData) {
+        console.log(data)
+        if (data.id == id && data.selected) {
+          // filter items after deleting
+          
+          break;
+        }
+      }
+      // setFile(renderData);
+    
+  };
+
+  const getDate=(str)=>{
+    return String(new Date(str))
+  }
   return (
     <View style={{flex: 1}}>
+       <Portal>
+       <Dialog visible={visible} onDismiss={hideDialog}>
+          <Dialog.Title>File info</Dialog.Title>
+          <Dialog.Content>
+            {FileInfo?(<>
+            <Subheading style={styles.DialogContentStyle}>Name:</Subheading>
+            <Paragraph >{FileInfo.name}</Paragraph>
+            <Subheading style={styles.DialogContentStyle}>FileSize:</Subheading>
+            <Paragraph >{ formatBytes(FileInfo.size)}</Paragraph>
+            <Subheading style={[styles.DialogContentStyle,{fontStyle:"italic"}]}>PATH:</Subheading>
+            <Paragraph >{FileInfo.path}</Paragraph>
+            <Subheading style={styles.DialogContentStyle}>LAST MODIFIED TIME:</Subheading>
+            <Paragraph >{ getDate(FileInfo.mtime)}</Paragraph>
+            
+            </>):(<Paragraph>Something went wrong</Paragraph>)}
+            <Paragraph></Paragraph>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={hideDialog}>OK</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
       <OrientationLocker orientation={PORTRAIT} />
-      <ListAppbar FileList={FileList} onFilterChange={FilterChange} onSearchBarClosed={onSearchBarClosed} OnSort={OnSort}  />
+      <ListAppbar
+        FileList={FileList}
+        onFilterChange={FilterChange}
+        onSearchBarClosed={onSearchBarClosed}
+        OnSort={OnSort}
+        OnselectCopy={OnselectCopy}
+        OnDeleteFiles={OnDeleteFiles}
+      />
       <FlatList
         // src: https://stackoverflow.com/questions/51742856/sorting-react-native-flatlist/51743104 in next line
-        data={!ShowFilteredData?FileList:FilteredData}
+        data={!ShowFilteredData ? FileList : FilteredData}
         renderItem={renderVideoItem}
         keyExtractor={item => item.id}
         numColumns={2}
@@ -129,5 +211,10 @@ const styles = StyleSheet.create({
   selectedCard: {
     backgroundColor: 'rgba(0, 0, 1, .4)',
   },
+  DialogContentStyle:{
+    fontWeight:"800",
+    fontSize:17,
+    textDecorationLine:"underline",
+    paddingTop:8
+  }
 });
-

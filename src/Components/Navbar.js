@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import {StyleSheet} from 'react-native';
 import {Appbar,Menu} from 'react-native-paper';
-import { navigate } from '../RootNavigation';
 
 
 
@@ -20,7 +19,6 @@ export default function Navbar({ openFolderPicker }) {
           onDismiss={closeMenu}
           anchor={<Appbar.Action icon="dots-vertical" onPress={openMenu} />}>
           <Menu.Item onPress={openFolderPicker} title="Choose Folder" />
-          <Menu.Item onPress={()=>navigate("ServePage")} title="Start Server" />
         </Menu>
     </Appbar.Header>
   );
