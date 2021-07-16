@@ -7,10 +7,17 @@ import {
   FlatList,
   StyleSheet,
 } from 'react-native';
-import {readDir} from 'react-native-fs';
+import {readDir, unlink} from 'react-native-fs';
+import filter from 'lodash.filter';
 
-import {isVideo, showToastWithGravityAndOffset,formatBytes} from '../Helper';
-import {Paragraph,  Portal,Dialog,Button, Subheading} from 'react-native-paper';
+import {isVideo, showToastWithGravityAndOffset, formatBytes} from '../Helper';
+import {
+  Paragraph,
+  Portal,
+  Dialog,
+  Button,
+  Subheading,
+} from 'react-native-paper';
 import {OrientationLocker, PORTRAIT} from 'react-native-orientation-locker';
 import ListAppbar from '../Components/ListAppbar';
 
@@ -41,7 +48,7 @@ function VideoList({route, navigation}) {
         setFile(VidListArray);
       })
       .catch(err => {
-        console.log(err);
+        // console.log(err);
       });
   }, []);
 
@@ -51,9 +58,6 @@ function VideoList({route, navigation}) {
       for (let data of renderData) {
         if (data.id == id) {
           data.selected = data.selected == null ? true : !data.selected;
-          if(data.selected){
-            console.log(data)
-          }
           break;
         }
       }
@@ -85,9 +89,8 @@ function VideoList({route, navigation}) {
           }
         }}
         onLongPress={() => {
-          console.log(item)
-          setFileInfo(item)
-          showModal()
+          setFileInfo(item);
+          showModal();
         }}>
         <View
           style={[
@@ -126,40 +129,56 @@ function VideoList({route, navigation}) {
 
   const OnDeleteFiles = () => {
     // start deleting files here
-    
+
     let renderData = [...FileList];
-      for (let data of renderData) {
-        console.log(data)
-        if (data.id == id && data.selected) {
-          // filter items after deleting
-          
-          break;
-        }
+
+    const FilteredData = filter(renderData, EachVidData => {
+      if (EachVidData.selected) {
+        unlink(EachVidData.path)
+          .then(() => {
+            return false;
+          })
+          .catch(err => {
+            // console.log(err.message)
+          });
+      } else {
+        return true;
       }
-      // setFile(renderData);
-    
+    });
+    setFile(FilteredData);
+    // setFile(FilteredData);
   };
 
-  const getDate=(str)=>{
-    return String(new Date(str))
-  }
+  const getDate = str => {
+    return String(new Date(str));
+  };
   return (
     <View style={{flex: 1}}>
-       <Portal>
-       <Dialog visible={visible} onDismiss={hideDialog}>
+      <Portal>
+        <Dialog visible={visible} onDismiss={hideDialog}>
           <Dialog.Title>File info</Dialog.Title>
           <Dialog.Content>
-            {FileInfo?(<>
-            <Subheading style={styles.DialogContentStyle}>Name:</Subheading>
-            <Paragraph >{FileInfo.name}</Paragraph>
-            <Subheading style={styles.DialogContentStyle}>FileSize:</Subheading>
-            <Paragraph >{ formatBytes(FileInfo.size)}</Paragraph>
-            <Subheading style={[styles.DialogContentStyle,{fontStyle:"italic"}]}>PATH:</Subheading>
-            <Paragraph >{FileInfo.path}</Paragraph>
-            <Subheading style={styles.DialogContentStyle}>LAST MODIFIED TIME:</Subheading>
-            <Paragraph >{ getDate(FileInfo.mtime)}</Paragraph>
-            
-            </>):(<Paragraph>Something went wrong</Paragraph>)}
+            {FileInfo ? (
+              <>
+                <Subheading style={styles.DialogContentStyle}>Name:</Subheading>
+                <Paragraph>{FileInfo.name}</Paragraph>
+                <Subheading style={styles.DialogContentStyle}>
+                  FileSize:
+                </Subheading>
+                <Paragraph>{formatBytes(FileInfo.size)}</Paragraph>
+                <Subheading
+                  style={[styles.DialogContentStyle, {fontStyle: 'italic'}]}>
+                  PATH:
+                </Subheading>
+                <Paragraph>{FileInfo.path}</Paragraph>
+                <Subheading style={styles.DialogContentStyle}>
+                  LAST MODIFIED TIME:
+                </Subheading>
+                <Paragraph>{getDate(FileInfo.mtime)}</Paragraph>
+              </>
+            ) : (
+              <Paragraph>Something went wrong</Paragraph>
+            )}
             <Paragraph></Paragraph>
           </Dialog.Content>
           <Dialog.Actions>
@@ -211,10 +230,10 @@ const styles = StyleSheet.create({
   selectedCard: {
     backgroundColor: 'rgba(0, 0, 1, .4)',
   },
-  DialogContentStyle:{
-    fontWeight:"800",
-    fontSize:17,
-    textDecorationLine:"underline",
-    paddingTop:8
-  }
+  DialogContentStyle: {
+    fontWeight: '800',
+    fontSize: 17,
+    textDecorationLine: 'underline',
+    paddingTop: 8,
+  },
 });

@@ -1,10 +1,7 @@
 import React, {useState} from 'react';
-import {StyleSheet} from 'react-native';
-import {Appbar,Menu} from 'react-native-paper';
+import {Appbar, Menu} from 'react-native-paper';
 
-
-
-export default function Navbar({ openFolderPicker }) {
+export default function Navbar({openFolderPicker}) {
   const [visible, setVisible] = useState(false);
 
   const openMenu = () => setVisible(true);
@@ -15,20 +12,12 @@ export default function Navbar({ openFolderPicker }) {
     <Appbar.Header dark={true}>
       <Appbar.Content title="VideoPlayer 📽" />
       <Menu
-          visible={visible}
-          onDismiss={closeMenu}
-          anchor={<Appbar.Action icon="dots-vertical" onPress={openMenu} />}>
-          <Menu.Item onPress={openFolderPicker} title="Choose Folder" />
-        </Menu>
+        visible={visible}
+        onDismiss={closeMenu}
+        anchor={<Appbar.Action icon="dots-vertical" onPress={openMenu} />}>
+        <Menu.Item onPress={openFolderPicker} title="Choose Folder" />
+      </Menu>
     </Appbar.Header>
   );
 }
 
-const styles = StyleSheet.create({
-  menuoption: {
-    paddingVertical: 10,
-  },
-  menutxt: {
-    textAlign: 'center',
-  },
-});

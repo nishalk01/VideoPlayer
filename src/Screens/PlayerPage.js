@@ -1,6 +1,6 @@
-import React, {useRef, useEffect, useState} from 'react';
-import {View, Text, StyleSheet, StatusBar, Animated} from 'react-native';
-import {IconButton, Colors, Paragraph, Button} from 'react-native-paper';
+import React, {useRef, useState} from 'react';
+import {View, Text, StyleSheet, StatusBar} from 'react-native';
+import {IconButton, Colors, Paragraph} from 'react-native-paper';
 import Video from 'react-native-video';
 import {
   OrientationLocker,
@@ -10,10 +10,11 @@ import {
 import {
   TapGestureHandler,
   State,
-  Swipeable,
 } from 'react-native-gesture-handler';
 import Slider from 'react-native-slider';
-import GestureRecognizer, {swipeDirections} from 'react-native-swipe-gestures';
+import GestureRecognizer from 'react-native-swipe-gestures';
+
+import { secondsToHms } from '../Helper';
 
 function PlayerPage({route, navigation}) {
   const videoPlayer = useRef(null);
@@ -25,8 +26,6 @@ function PlayerPage({route, navigation}) {
   const [CurrentDuration, setCurrentDuration] = useState(0);
   const [SliderValue, setSliderValue] = useState(1);
 
-  const [ShowVolume, setShowVolume] = useState(false);
-  const [Volume, setVolume] = useState(10);
   const [Duration, setDuration] = useState(0);
   const [Locked, setLocked] = useState(false);
   // for hiding lock after 2 second timeout
@@ -38,7 +37,7 @@ function PlayerPage({route, navigation}) {
       setSliderValue(0);
     }
 
-    console.log('has ended');
+  
   };
 
   const onLoad = data => {
@@ -94,20 +93,10 @@ function PlayerPage({route, navigation}) {
     VideoWidth == 0 ? 'contain' : VideoWidth == 1 ? 'cover' : 'stretch';
 
   return (
-    <View style={{flex: 1, backgroundColor: 'black'}}>
+    <View style={styles.container}>
       {ShowControls ? (
         <View
-          style={{
-            width: '100%',
-            height: 55,
-            backgroundColor: 'rgba(0, 0, 0, .4)',
-            top: 0,
-            position: 'absolute',
-
-            zIndex: 10,
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}>
+          style={styles.controlContainer}>
           <IconButton
             icon="arrow-left"
             color={Colors.white}
@@ -120,35 +109,6 @@ function PlayerPage({route, navigation}) {
             style={{flex: 3, marginRight: 10, color: 'white'}}>
             {route.params.filename}
           </Paragraph>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              justifyContent: 'flex-end',
-              alignItems: 'center',
-              marginLeft: 20,
-            }}>
-            <IconButton
-              icon="arrow-left"
-              color={Colors.white}
-              size={30}
-              onPress={() => setisPaused(!isPaused)}
-            />
-
-            <IconButton
-              icon="music-note-eighth"
-              // icon={Mute?"music-note-off":"music-note-eighthmusic-note-eighth"}
-              color={Colors.white}
-              size={30}
-              onPress={() => console.log('nute')}
-            />
-            <IconButton
-              icon="arrow-left"
-              color={Colors.white}
-              size={30}
-              onPress={() => setisPaused(!isPaused)}
-            />
-          </View>
         </View>
       ) : null}
 
@@ -169,24 +129,15 @@ function PlayerPage({route, navigation}) {
             style={{flex: 1}}
             onSwipeLeft={gestureState => {
               const val_scale = (10 * (Math.abs(gestureState.dx) - 28)) / 778;
-              console.log(
-                `Current duration is ${CurrentDuration}  and val affecting it is ${val_scale}`,
-              );
               videoPlayer.current.seek(CurrentDuration - 50 * val_scale);
-              console.log(
-                `Current duration is ${
-                  CurrentDuration - val_scale
-                }  and val affecting it is after ${val_scale}`,
-              );
             }}
             // 28 and 750
 
             onSwipeRight={gestureState => {
               const val_scale = (10 * (Math.abs(gestureState.dx) - 28)) / 778;
-              // console.log(`Current duration is ${CurrentDuration}  and val affecting it is ${val_scale}`)
               videoPlayer.current.seek(CurrentDuration + 50 * val_scale);
             }}
-            onSwipeUp={() => console.log('swiped up')}>
+            >
             <Video
               onEnd={onEnd}
               onLoad={onLoad}
@@ -194,7 +145,6 @@ function PlayerPage({route, navigation}) {
               onProgress={onProgress}
               onError={onError}
               paused={isPaused}
-              muted={false}
               fullscreen={Rotate}
               fullscreenAutorotate={true}
               resizeMode={changeVidWidth}
@@ -206,7 +156,6 @@ function PlayerPage({route, navigation}) {
               }}
               style={styles.backgroundVideo}
               // playInBackground={true}
-              volume={Volume}
             />
             {/* volume slider */}
           </GestureRecognizer>
@@ -215,20 +164,10 @@ function PlayerPage({route, navigation}) {
 
       {ShowControls ? (
         <View
-          style={{
-            backgroundColor: 'rgba(0, 0, 0, .4)',
-            position: 'absolute',
-            bottom: 0,
-            width: '100%',
-            alignItems: 'flex-start',
-          }}>
+          style={styles.bottomSildeControls}>
           <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-evenly',
-            }}>
-            <Text>43:22</Text>
+            style={styles.SilderContainer}>
+            <Text  style={{ color:"white"}}> {secondsToHms(CurrentDuration)}</Text>
             <Slider
               maximumValue={100}
               minimumValue={0}
@@ -241,16 +180,11 @@ function PlayerPage({route, navigation}) {
               style={{width: '90%', flex: 1, marginHorizontal: 1}}
               onValueChange={slideToChangeTime}
             />
-            <Text>43:22</Text>
+            <Text style={{ color:"white"}}>{ secondsToHms(Duration)}</Text>
           </View>
 
           <View
-            style={{
-              flexDirection: 'row',
-              width: '100%',
-              justifyContent: 'space-around',
-              height: 65,
-            }}>
+            style={styles.bottomIconContainer}>
             <IconButton
               icon="lock"
               color={Colors.white}
@@ -308,13 +242,13 @@ function PlayerPage({route, navigation}) {
                   setVideoWidth(0);
                 }
               }}
-              style={{alignSelf: 'center', transform: [{rotateZ: '45deg'}]}}
+              style={styles.skipStyles}
             />
           </View>
         </View>
       ) : null}
 
-      <View style={{position: 'absolute', top: 50, left: 5}}>
+      <View style={styles.SRIcon}>
         {ShowControls ? (
           <IconButton
             icon="screen-rotation"
@@ -344,6 +278,10 @@ function PlayerPage({route, navigation}) {
 export default PlayerPage;
 
 var styles = StyleSheet.create({
+  container:{
+    flex: 1, 
+    backgroundColor: 'black'
+  },
   backgroundVideo: {
     position: 'absolute',
     top: 0,
@@ -357,4 +295,48 @@ var styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
   },
+  controlContainer:{
+    
+      width: '100%',
+      height: 55,
+      backgroundColor: 'rgba(0, 0, 0, .4)',
+      top: 0,
+      position: 'absolute',
+      zIndex: 10,
+      flexDirection: 'row',
+      alignItems: 'center',
+    
+  },
+  bottomSildeControls:{
+      backgroundColor: 'rgba(0, 0, 0, .4)',
+      position: 'absolute',
+      bottom: 0,
+      width: '100%',
+      alignItems: 'flex-start',
+    
+  },
+  SilderContainer:{
+    
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-evenly',
+    
+  },
+  bottomIconContainer:{
+      flexDirection: 'row',
+      width: '100%',
+      justifyContent: 'space-around',
+      height: 65,
+    
+  },
+  skipStyles:{
+    alignSelf: 'center', 
+    transform: [{rotateZ: '45deg'}]
+  },
+  SRIcon:{
+    position: 'absolute',
+    top: 50,
+    left: 5
+  }
+
 });

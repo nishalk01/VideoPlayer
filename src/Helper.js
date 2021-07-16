@@ -1,5 +1,6 @@
 import {readDir} from 'react-native-fs';
 import {ToastAndroid} from 'react-native';
+
 //src:  https://stackoverflow.com/questions/9229645/remove-duplicate-values-from-js-array
 export const getExtension = filename => {
   var parts = filename.split('.');
@@ -33,6 +34,8 @@ export function walkDir(dir, callback) {
   });
 }
 
+// for toast messages
+
 export const showToastWithGravityAndOffset = message => {
   ToastAndroid.showWithGravityAndOffset(
     String(message),
@@ -42,7 +45,6 @@ export const showToastWithGravityAndOffset = message => {
     50,
   );
 };
-
 
 // src: https://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript
 
@@ -56,4 +58,15 @@ export function formatBytes(bytes, decimals = 2) {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
+// src: https://stackoverflow.com/questions/5539028/converting-seconds-into-hhmmss for converting seconds to duration
+export function secondsToHms(d) {
+  d = Number(d);
+
+  var h = Math.floor(d / 3600);
+  var m = Math.floor(d % 3600 / 60);
+  var s = Math.floor(d % 3600 % 60);
+
+  return ('0' + h).slice(-2) + ":" + ('0' + m).slice(-2) + ":" + ('0' + s).slice(-2);
 }

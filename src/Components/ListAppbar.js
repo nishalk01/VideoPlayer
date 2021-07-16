@@ -124,8 +124,7 @@ export default function ListAppbar({
               if (!selectDelete) {
                 showDialog();
               } else {
-                console.log('do deleting');
-                OnDeleteFiles()
+                OnDeleteFiles();
               }
             }
           }

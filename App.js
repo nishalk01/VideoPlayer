@@ -18,7 +18,7 @@ import FolderScreen from './src/Screens/FolderScreen';
 import VideoList from './src/Screens/VideoList';
 import PlayerPage from './src/Screens/PlayerPage';
 
-import { navigationRef } from './src/RootNavigation';
+import {navigationRef} from './src/RootNavigation';
 
 const theme = {
   ...DefaultTheme,
@@ -34,30 +34,29 @@ const Stack = createStackNavigator();
 
 const App = () => {
   return (
-      <PaperProvider theme={theme}>
-          <StatusBar backgroundColor="#1aa3ff" hidden={false} />
-        <NavigationContainer ref={navigationRef}>
-          <Stack.Navigator>
-            <Stack.Screen
-              name="FolderScreen"
-              options={{headerShown: false}}
-              component={FolderScreen}
-            />
-            <Stack.Screen
-              name="VideoList"
-              options={{headerShown: false}}
-              component={VideoList}
-            />
+    <PaperProvider theme={theme}>
+      <StatusBar backgroundColor="#1aa3ff" hidden={false} />
+      <NavigationContainer ref={navigationRef}>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="FolderScreen"
+            options={{headerShown: false}}
+            component={FolderScreen}
+          />
+          <Stack.Screen
+            name="VideoList"
+            options={{headerShown: false}}
+            component={VideoList}
+          />
 
-            <Stack.Screen
-              name="Player"
-              options={{headerShown: false}}
-              component={gestureHandlerRootHOC(PlayerPage)}
-            />
-          
-          </Stack.Navigator>
-        </NavigationContainer>
-      </PaperProvider>
+          <Stack.Screen
+            name="Player"
+            options={{headerShown: false, animationEnabled: false}}
+            component={gestureHandlerRootHOC(PlayerPage)}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </PaperProvider>
   );
 };
 
